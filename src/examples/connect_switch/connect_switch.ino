@@ -2,6 +2,7 @@
 
 void setup()
 {
+	SwitchControlLibrary();
 }
 
 int loopCount = 0;
