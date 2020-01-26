@@ -46,13 +46,9 @@ VID=0x0f0d, PID=0x0092 へ変更してボードへ書き込んでください。
   // MoveLeftStick(uint8_t lx, uint8_t ly);
   // lx x軸座標(0〜255)
   // ly y軸座標(0〜255)
-  // 値が 0, 128, 255 の場合、Stick Enumを利用できます。
 
   // 左スティックを左へ(数値の場合)
   SwitchControlLibrary().MoveLeftStick(0, 128);
-
-  // 左スティックを左へ(Stick Enum利用時)
-  SwitchControlLibrary().MoveLeftStick(Stick::MIN, Stick::CENTER);
   ```
 
 ## ライセンス
