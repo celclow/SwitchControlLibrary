@@ -4,6 +4,9 @@
 
 Arduino を Switch コントローラーとして認識させます。
 
+**v2 系 は v1 系とは互換性がありません。**
+過去バージョンは[Release](https://github.com/celclow/SwitchControlLibrary/releases)ページよりダウンロードできます。
+
 ## 使い方
 
 VID=0x0f0d, PID=0x0092 へ変更してボードへ書き込んでください。
@@ -13,42 +16,112 @@ VID=0x0f0d, PID=0x0092 へ変更してボードへ書き込んでください。
 
 ## 操作方法
 
-メソッドの定義は `SwitchControlLibrary.h` を参照。
-
 - ボタンを押す
 
-  ```
-  // Aボタンを押す
-  SwitchControlLibrary().PressButtonA();
-  ```
+  - `pressButton(uint8_t button)`
 
-- ボタンを離す
+    ```
+    SwitchControlLibrary().pressButton(Button::A); // Aボタンを押す
+    SwitchControlLibrary().pressButton(Button::B); // Bボタンを押す
+    ```
 
-  ```
-  // Aボタンを離す
-  SwitchControlLibrary().ReleaseButtonA();
-  ```
+  - `releaseButton(uint8_t button)`
+
+    ```
+    SwitchControlLibrary().releaseButton(Button::A); // Aボタンを離す
+    SwitchControlLibrary().releaseButton(Button::B); // Bボタンを離す
+    ```
+
+  - `Button` 定義一覧
+
+    ```
+    Button::Y
+    Button::B
+    Button::A
+    Button::X
+    Button::L
+    Button::R
+    Button::ZL
+    Button::ZR
+    Button::MINUS
+    Button::PLUS
+    Button::LCLICK
+    Button::RCLICK
+    Button::HOME
+    Button::CAPTURE
+    ```
 
 - ハット
 
-  Hat の定義は `SwitchControlLibrary.h` を参照。
+  - `moveHat(uint8_t hat)`
+
+    ```
+    SwitchControlLibrary().moveHat(Hat::UP); // ハットは上
+    SwitchControlLibrary().moveHat(Hat::RIGHT); // ハットは右
+    ```
+
+  - `Hat` 定義一覧
+
+    ```
+    Hat::UP
+    Hat::UP_RIGHT
+    Hat::RIGHT
+    Hat::DOWN_RIGHT
+    Hat::DOWN
+    Hat::DOWN_LEFT
+    Hat::LEFT
+    Hat::UP_LEFT
+    Hat::NEUTRAL
+    ```
+
+  - `pressHat(uint8_t hat_button)` `releaseHat(uint8_t hat_button)`
+
+    ```
+    SwitchControlLibrary().pressHat(HatButton::UP) // ハットは上
+    SwitchControlLibrary().pressHat(HatButton::RIGHT) // ハットは右上
+    SwitchControlLibrary().releaseHat(HatButton::UP) // ハットは右
+    SwitchControlLibrary().releaseHat(HatButton::RIGHT) // ハットはニュートラル
+    ```
+
+  - `HatButton` 定義一覧
+
+    ```
+    HatButton::UP
+    HatButton::RIGHT
+    HatButton::DOWN
+    HatButton::LEFT
+    ```
+
+- スティック
+
+  - `moveLeftStick(uint8_t lx, uint8_t ly)` `moveRightStick(uint8_t rx, uint8_t ry)`
+
+    - `lx` `ly` `rx` `ry` には、0〜255 の値を指定します。
+
+    ```
+    SwitchControlLibrary().moveLeftStick(0, 128) // 左スティックは左
+    SwitchControlLibrary().moveLeftStick(128, 128) // 左スティックはニュートラル
+    SwitchControlLibrary().moveLeftStick(255, 128) // 左スティックは右
+    SwitchControlLibrary().moveLeftStick(Stick::MIN, Stick::NEUTRAL) // 左スティックは左
+    SwitchControlLibrary().moveLeftStick(Stick::MAX, Stick::NEUTRAL) // 左スティックは右
+    ```
+
+  - `Stick` 定義一覧
+
+    ```
+    Stick::MIN
+    Stick::NEUTRAL
+    Stick::MAX
+    ```
+
+- `sendReport()`
+
+  `sendReport()` を実行したタイミングでキーが送信されます。
 
   ```
-  // ハットを左へ
-  SwitchControlLibrary().MoveHat(Hat::LEFT);
-  ```
-
-* スティック
-
-  Stick の定義は `SwitchControlLibrary.h` を参照。
-
-  ```
-  // MoveLeftStick(uint8_t lx, uint8_t ly);
-  // lx x軸座標(0〜255)
-  // ly y軸座標(0〜255)
-
-  // 左スティックを左へ(数値の場合)
-  SwitchControlLibrary().MoveLeftStick(0, 128);
+  SwitchControlLibrary().pressButton(Button::A); // ニュートラル
+  SwitchControlLibrary().pressButton(Button::B); // ニュートラル
+  SwitchControlLibrary().sendReport() // A、Bボタンが同時に送信される
   ```
 
 ## ライセンス

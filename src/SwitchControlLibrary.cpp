@@ -46,210 +46,128 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0xc0              // END_COLLECTION
 };
 
+uint8_t HatState::getHat()
+{
+
+    uint8_t hat_button = 0b0000;
+    uint8_t i = 0;
+    for (auto itr = _hat_button_state.begin(); itr != _hat_button_state.end() && i < 2; ++itr, ++i)
+    {
+        hat_button |= *itr;
+    }
+
+    uint8_t hat = Hat::NEUTRAL;
+    switch (hat_button)
+    {
+    case 0b0000:
+        hat = Hat::NEUTRAL;
+        break;
+    case 0b0001:
+        hat = Hat::UP;
+        break;
+    case 0b0010:
+        hat = Hat::RIGHT;
+        break;
+    case 0b0011:
+        hat = Hat::UP_RIGHT;
+        break;
+    case 0b0100:
+        hat = Hat::DOWN;
+        break;
+    case 0b0110:
+        hat = Hat::DOWN_RIGHT;
+        break;
+    case 0b1000:
+        hat = Hat::LEFT;
+        break;
+    case 0b1001:
+        hat = Hat::UP_LEFT;
+        break;
+    default:
+        hat = Hat::NEUTRAL;
+        break;
+    }
+    return hat;
+}
+
+HatState::HatState()
+{
+}
+
+uint8_t HatState::pressHatButton(uint8_t hat_button)
+{
+    auto itr = std::find(_hat_button_state.begin(), _hat_button_state.end(), hat_button);
+    if (itr == _hat_button_state.end())
+    {
+        _hat_button_state.push_front(hat_button);
+    }
+
+    return getHat();
+}
+
+uint8_t HatState::releaseHatButton(uint8_t hat_button)
+{
+    auto itr = std::find(_hat_button_state.begin(), _hat_button_state.end(), hat_button);
+    if (itr != _hat_button_state.end())
+    {
+        _hat_button_state.erase(itr);
+    }
+    return getHat();
+}
+
 SwitchControlLibrary_::SwitchControlLibrary_()
 {
     static HIDSubDescriptor node(_hidReportDescriptor, sizeof(_hidReportDescriptor));
     CustomHID().AppendDescriptor(&node);
 
     memset(&_joystickInputData, 0, sizeof(USB_JoystickReport_Input_t));
-    _joystickInputData.LX = (uint8_t)Stick::CENTER;
-    _joystickInputData.LY = (uint16_t)Stick::CENTER;
-    _joystickInputData.RX = (uint16_t)Stick::CENTER;
-    _joystickInputData.RY = (uint16_t)Stick::CENTER;
-    _joystickInputData.Hat = (uint16_t)Hat::CENTER;
+    _joystickInputData.LX = Stick::NEUTRAL;
+    _joystickInputData.LY = Stick::NEUTRAL;
+    _joystickInputData.RX = Stick::NEUTRAL;
+    _joystickInputData.RY = Stick::NEUTRAL;
+    _joystickInputData.Hat = Hat::NEUTRAL;
 }
 
-void SwitchControlLibrary_::SendReport()
+void SwitchControlLibrary_::sendReport()
 {
     CustomHID().SendReport(&_joystickInputData, sizeof(USB_JoystickReport_Input_t));
 }
 
-void SwitchControlLibrary_::PressButtonY()
+void SwitchControlLibrary_::pressButton(uint16_t button)
 {
-    _joystickInputData.Button |= (uint16_t)Button::Y;
-    SendReport();
+    _joystickInputData.Button |= button;
 }
 
-void SwitchControlLibrary_::ReleaseButtonY()
+void SwitchControlLibrary_::releaseButton(uint16_t button)
 {
-    _joystickInputData.Button &= ((uint16_t)Button::Y ^ 0xffff);
-    SendReport();
+    _joystickInputData.Button &= (button ^ 0xffff);
 }
 
-void SwitchControlLibrary_::PressButtonB()
-{
-    _joystickInputData.Button |= (uint16_t)Button::B;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonB()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::B ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonA()
-{
-    _joystickInputData.Button |= (uint16_t)Button::A;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonA()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::A ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonX()
-{
-    _joystickInputData.Button |= (uint16_t)Button::X;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonX()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::X ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonL()
-{
-    _joystickInputData.Button |= (uint16_t)Button::L;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonL()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::L ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonR()
-{
-    _joystickInputData.Button |= (uint16_t)Button::R;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonR()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::R ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonZL()
-{
-    _joystickInputData.Button |= (uint16_t)Button::ZL;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonZL()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::ZL ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonZR()
-{
-    _joystickInputData.Button |= (uint16_t)Button::ZR;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonZR()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::ZR ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonMinus()
-{
-    _joystickInputData.Button |= (uint16_t)Button::MINUS;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonMinus()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::MINUS ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonPlus()
-{
-    _joystickInputData.Button |= (uint16_t)Button::PLUS;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonPlus()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::PLUS ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonLClick()
-{
-    _joystickInputData.Button |= (uint16_t)Button::LCLICK;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonLClick()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::LCLICK ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonRClick()
-{
-    _joystickInputData.Button |= (uint16_t)Button::RCLICK;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonRClick()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::RCLICK ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonHome()
-{
-    _joystickInputData.Button |= (uint16_t)Button::HOME;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonHome()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::HOME ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::PressButtonCapture()
-{
-    _joystickInputData.Button |= (uint16_t)Button::CAPTURE;
-    SendReport();
-}
-
-void SwitchControlLibrary_::ReleaseButtonCapture()
-{
-    _joystickInputData.Button &= ((uint16_t)Button::CAPTURE ^ 0xffff);
-    SendReport();
-}
-
-void SwitchControlLibrary_::MoveHat(uint8_t hat)
+void SwitchControlLibrary_::moveHat(uint8_t hat)
 {
     _joystickInputData.Hat = hat;
-    SendReport();
 }
 
-void SwitchControlLibrary_::MoveLeftStick(uint8_t lx, uint8_t ly)
+void SwitchControlLibrary_::pressHatButton(uint8_t hat_button)
+{
+    _joystickInputData.Hat = _hatState.pressHatButton(hat_button);
+}
+
+void SwitchControlLibrary_::releaseHatButton(uint8_t hat_button)
+{
+    _joystickInputData.Hat = _hatState.releaseHatButton(hat_button);
+}
+
+void SwitchControlLibrary_::moveLeftStick(uint8_t lx, uint8_t ly)
 {
     _joystickInputData.LX = lx;
     _joystickInputData.LY = ly;
-    SendReport();
 }
 
-void SwitchControlLibrary_::MoveRightStick(uint8_t rx, uint8_t ry)
+void SwitchControlLibrary_::moveRightStick(uint8_t rx, uint8_t ry)
 {
     _joystickInputData.RX = rx;
     _joystickInputData.RY = ry;
-    SendReport();
 }
 
 SwitchControlLibrary_ &SwitchControlLibrary()

@@ -2,28 +2,33 @@
 
 void setup()
 {
-	SwitchControlLibrary();
+    SwitchControlLibrary();
 }
 
 int loopCount = 0;
 void loop()
 {
-	if (100 < loopCount)
-		loopCount = 0;
+    if (100 < loopCount)
+        loopCount = 0;
 
-	if (loopCount == 50)
-	{
-		SwitchControlLibrary().PressButtonL();
-		SwitchControlLibrary().PressButtonR();
-		SwitchControlLibrary().ReleaseButtonL();
-		SwitchControlLibrary().ReleaseButtonR();
-	}
+    if (loopCount == 50)
+    {
+        SwitchControlLibrary().pressButton(Button::L);
+        SwitchControlLibrary().pressButton(Button::R);
+        SwitchControlLibrary().sendReport();
 
-	if (loopCount == 100)
-	{
-		SwitchControlLibrary().PressButtonA();
-		SwitchControlLibrary().ReleaseButtonA();
-	}
+        SwitchControlLibrary().releaseButton(Button::L);
+        SwitchControlLibrary().releaseButton(Button::R);
+        SwitchControlLibrary().sendReport();
+    }
 
-	loopCount++;
+    if (loopCount == 100)
+    {
+        SwitchControlLibrary().pressButton(Button::A);
+        SwitchControlLibrary().releaseButton(Button::A);
+    }
+
+    SwitchControlLibrary().sendReport();
+
+    loopCount++;
 }
