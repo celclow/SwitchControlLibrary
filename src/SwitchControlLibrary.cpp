@@ -83,7 +83,7 @@ uint8_t HatState::getHat()
     case 0b1001:
         hat = Hat::UP_LEFT;
         break;
-    case 0b1010:
+    case 0b1100:
         hat = Hat::DOWN_LEFT;
         break;
     default:
